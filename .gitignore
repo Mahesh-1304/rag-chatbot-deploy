@@ -1,0 +1,65 @@
+# ============================================================
+# RAG Document Chatbot — .gitignore
+# ============================================================
+
+# ---- Environment & Secrets (NEVER commit these) ----
+.env
+*.env
+!.env.example
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ---- Virtual Environment ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- FAISS Vector Store (rebuilt locally) ----
+embeddings/vector_store/index.faiss
+embeddings/vector_store/metadata.json
+
+# ---- Processed Data (rebuilt locally) ----
+data/processed_docs/chunks.json
+
+# ---- Raw Documents (personal files) ----
+data/raw_docs/*.pdf
+data/raw_docs/*.docx
+
+# ---- Logs ----
+logs/
+*.log
+
+# ---- Models ----
+models/
+*.gguf
+*.bin
+
+# ---- OS Files ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---- pytest ----
+.pytest_cache/
+htmlcov/
+.coverage
+
+# ---- Jupyter ----
+*.ipynb
+.ipynb_checkpoints/
