@@ -1,4 +1,5 @@
 # api/main.py
+import os
 import logging
 import time
 import shutil
@@ -52,14 +53,40 @@ def try_init_retriever():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Application starting up...")
+
+    # ===== GROQ VALIDATION =====
+    key = getattr(settings, "GROQ_API_KEY", None)
+
+    if not key:
+        logger.error("GROQ_API_KEY not found")
+    else:
+        logger.info("GROQ_API_KEY loaded successfully")
+        logger.info(f"Groq key length: {len(key)}")
+        logger.info(f"Groq key starts with: {key[:6]}...")
+
+    # ===== VECTOR STORE VALIDATION =====
+    index_path = settings.VECTOR_STORE_DIR / "index.faiss"
+    metadata_path = settings.VECTOR_STORE_DIR / "metadata.json"
+
+    logger.info(f"Vector index exists: {index_path.exists()}")
+    logger.info(f"Metadata exists: {metadata_path.exists()}")
+
+    if index_path.exists():
+        logger.info(f"Index path: {index_path}")
+
+    if metadata_path.exists():
+        logger.info(f"Metadata path: {metadata_path}")
+
+    # ===== RETRIEVER INIT =====
     try:
         try_init_retriever()
     except Exception as e:
-        logger.error(f"Failed to initialize: {e}")
+        logger.error(f"Failed to initialize retriever: {e}", exc_info=True)
         app_state.initialized = False
-    yield
-    logger.info("Shutdown complete")
 
+    yield
+
+    logger.info("Shutdown complete")
 
 app = FastAPI(
     title="RAG Document Chatbot API",
@@ -68,8 +95,9 @@ app = FastAPI(
 )
 
 app.add_middleware(
-    CORSMiddleware,
+     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -210,11 +238,13 @@ async def health_check():
         retriever_stats = None
         if app_state.retriever:
             retriever_stats = app_state.retriever.get_stats()
-        return HealthResponse(
-            status="healthy" if app_state.initialized else "degraded",
-            initialized=app_state.initialized,
-            retriever_stats=retriever_stats,
-        )
+        return {
+    "status": "healthy" if app_state.initialized else "degraded",
+    "initialized": app_state.initialized,
+    "retriever_stats": retriever_stats,
+    "groq_key_loaded": bool(getattr(settings, "GROQ_API_KEY", None)),
+    "timestamp": datetime.now().isoformat(),
+}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
