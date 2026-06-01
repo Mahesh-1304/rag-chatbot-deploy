@@ -2,9 +2,9 @@ services:
   - type: web
     name: rag-chatbot
     env: python
-    plan: starter          # 512MB free tier — fits now with lazy loading
+    plan: starter
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --workers 1
+    startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port 10000 --workers 1
     envVars:
       - key: GROQ_API_KEY
         sync: false
@@ -20,3 +20,5 @@ services:
         value: all-MiniLM-L6-v2
       - key: RETRIEVER_TOP_K
         value: "3"
+      - key: API_PORT
+        value: "10000"
