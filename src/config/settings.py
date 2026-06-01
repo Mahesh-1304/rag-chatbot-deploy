@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     VECTOR_STORE_DIR: Path = BASE_DIR / "embeddings" / "vector_store"
     MODELS_DIR: Path = BASE_DIR / "models"
     LOGS_DIR: Path = BASE_DIR / "logs"
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama-3.1-8b-instant"
 
     MODEL_PATH: Optional[Path] = None
 
@@ -70,6 +72,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"  # Ignore extra fields in .env
 
     def __init__(self, **data):
         super().__init__(**data)

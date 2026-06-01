@@ -9,7 +9,7 @@ services:
       - key: GROQ_API_KEY
         sync: false
       - key: GROQ_MODEL
-        value: llama3-8b-8192
+        value: llama-3.1-8b-instant 
       - key: RETRIEVER_SCORE_THRESHOLD
         value: "0.1"
       - key: LLM_MAX_TOKENS

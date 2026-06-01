@@ -1,6 +1,6 @@
-﻿import os
-import logging
+﻿import logging
 from src.llm.prompt_templates import SYSTEM_PROMPT
+from src.config.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ def generate_answer(context: str, query: str) -> str:
 
         client = OpenAI(
             base_url="https://api.groq.com/openai/v1",
-            api_key=os.getenv("GROQ_API_KEY"),
+            api_key=settings.GROQ_API_KEY,
         )
 
         user_message = (
@@ -21,13 +21,13 @@ def generate_answer(context: str, query: str) -> str:
         )
 
         response = client.chat.completions.create(
-            model=os.getenv("GROQ_MODEL", "llama3-8b-8192"),
+            model=settings.GROQ_MODEL,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_message},
             ],
-            max_tokens=512,
-            temperature=0.0,
+            max_tokens=settings.LLM_MAX_TOKENS,
+            temperature=settings.LLM_TEMPERATURE,
         )
 
         answer = response.choices[0].message.content.strip()
